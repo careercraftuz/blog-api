@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+from .models import Post
+from .serializers import PostSerializer
+
 class UserView(APIView):
     def get(self,request,id:int):
         try:
@@ -40,3 +43,12 @@ class CreateUser(APIView):
                 last_name = data.get('last_name', '')
             )
             return Response({"message": "User created successfully."})
+        
+
+class PostsView(APIView):
+    def get(self, request: Request) -> Response:
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+
+        return Response({"posts": serializer.data})
+        
