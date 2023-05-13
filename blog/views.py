@@ -17,3 +17,4 @@ class UserView(APIView):
         user.save()
         
         return Response({'result':user.username})
+
