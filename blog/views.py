@@ -23,3 +23,13 @@ class CreateUser(APIView):
             return Response({ "message": "User created successfully." })
         else:
             return Response({"result":"such a user exists"})
+class Users(APIView):
+    def get(self,request):
+        try:
+            data=[]
+            users=User.objects.all()
+            for user in users:
+                data.append({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
+            return Response(data)
+        except:
+            return Response({'result':'Users not found'})
