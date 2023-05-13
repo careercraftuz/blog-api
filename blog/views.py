@@ -13,8 +13,8 @@ class UserView(APIView):
 class CreateUser(APIView):
     def post(self,request:Request):
         data=request.data
-        username= data.get('username',False)
-        password = data.get('password',False)
+        username= data.get('username')
+        password = data.get('password')
         first_name = data.get('first_name',False)
         last_name = data.get('last_name',False)
         user = User.objects.filter(username=username,password=password)
