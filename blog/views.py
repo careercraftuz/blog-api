@@ -9,3 +9,13 @@ class UserView(APIView):
             return Response({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
         except:
             return Response({'result':'User not found'})
+class Users(APIView):
+    def get(self,request):
+        try:
+            data=[]
+            users=User.objects.all()
+            for user in users:
+                data.append({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
+            return Response(data)
+        except:
+            return Response({'result':'Users not found'})
