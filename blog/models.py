@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 
 class Post(models.Model):
     title   = models.CharField(max_length=255)
-    context = models.TextField()
-    publication_data = models.DateTimeField(auto_created=True)
+    content = models.TextField()
+    publication_data = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
