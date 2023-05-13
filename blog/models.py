@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class PostModel(models.Model):
-    title = models.CharField(max_length=75)
+    title = models.CharField()
     content = models.TextField()
     publication_date = models.DateField(auto_now=True)
     author = models.ForeignKey(User, related_name=models.CASCADE)
