@@ -1,8 +1,14 @@
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 from rest_framework.response import Response
-from django.contrib.auth.hashers import make_password
+from rest_framework.request import Request
 from rest_framework import status
+
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+
+from .models import Post
+from .serializers import PostSerializer
+
 
 class UserView(APIView):
     def get(self,request,id:int):
@@ -11,6 +17,8 @@ class UserView(APIView):
             return Response({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
         except:
             return Response({'result':'User not found'})
+        
+
 class Users(APIView):
     def get(self,request):
         try:
@@ -21,14 +29,23 @@ class Users(APIView):
             return Response(data)
         except:
             return Response({'result':'Users not found'})
+        
+
+class PostsView(APIView):
+    def get(self, request: Request) -> Response:
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+
+        return Response({"posts": serializer.data})
+        
 
 class CreateUser(APIView):
     def post(self,request):
         data=request.data
-        username=data.get('username',None)
-        password=data.get('password',None)
-        first_name=data.get('first_name',None)
-        last_name=data.get('last_name',None)
+        username=data.get('username', None)
+        password=data.get('password', None)
+        first_name=data.get('first_name', None)
+        last_name=data.get('last_name', None)
         if username==None or password==None:
             return Response({'result':'didn\'t input required data'})
         try:
