@@ -37,6 +37,16 @@ class PostsView(APIView):
         serializer = PostSerializer(posts, many=True)
 
         return Response({"posts": serializer.data})
+    
+
+class PostView(APIView):
+    def get(self, request: Request, id: int) -> Response:
+        try:
+            post = Post.objects.get(id=id)
+            serializer = PostSerializer(post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({"Status": "This post doesn't exist."}, status=status.HTTP_404_NOT_FOUND)
         
 
 class CreateUser(APIView):
