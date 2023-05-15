@@ -69,3 +69,18 @@ class CreatePostView(APIView):
             serializer.save()
             return Response(serializer.data,status=201)
         return Response(serializer.errors,status=401)
+class UpdatePost(APIView):
+    def put(self,request:Request,id:id)->Response:
+        user = request.user
+        try:
+            task = Post.objects.get(user=user,id=id)
+            data = request.data
+            serializer = PostSerializer(task, data=data, partial=True)
+            if serializer.is_valid():
+                 serializer.save()
+                    
+            return Response(serializer.data,status=status.HTTP_200_OK)
+               
+                
+        except:
+                return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
