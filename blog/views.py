@@ -71,6 +71,7 @@ class CreateUser(APIView):
             user.save()
             return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
 
+
 class CreatePostView(APIView):
     def post(self,request:Request):
         data = request.data
@@ -79,6 +80,8 @@ class CreatePostView(APIView):
             serializer.save()
             return Response(serializer.data,status=201)
         return Response(serializer.errors,status=401)
+
+
 class UpdatePost(APIView):
     def put(self,request:Request,id:id)->Response:
         user = request.user
@@ -88,9 +91,6 @@ class UpdatePost(APIView):
             serializer = PostSerializer(task, data=data, partial=True)
             if serializer.is_valid():
                  serializer.save()
-                    
             return Response(serializer.data,status=status.HTTP_200_OK)
-               
-                
         except:
                 return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
