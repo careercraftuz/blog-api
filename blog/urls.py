@@ -5,6 +5,8 @@ from .views import (
     CreateUser,
     PostsView,
     CreatePostView,
+    DeletePostView,
+
     )
 
 urlpatterns = [
@@ -13,4 +15,5 @@ urlpatterns = [
     path('users/', CreateUser.as_view()),
     path('posts/', PostsView.as_view()),
     path('create-post/',CreatePostView.as_view()),
+    path('delete-post/<int:pk>/',DeletePostView.as_view()),
 ]

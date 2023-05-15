@@ -69,3 +69,13 @@ class CreatePostView(APIView):
             serializer.save()
             return Response(serializer.data,status=201)
         return Response(serializer.errors,status=401)
+    
+
+class DeletePostView(APIView):
+    def post(self,request:Request,pk):
+        try:
+            delete = Post.objects.get(id=pk)
+            delete.delete()
+            return Response({{ "status": "deleted post"}})
+        except:
+            return Response({"result":"url error"})
