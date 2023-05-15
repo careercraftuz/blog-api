@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 
+
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
@@ -61,3 +62,23 @@ class CreateUser(APIView):
             user.save()
             return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
 
+class UpdatePost(APIView):
+    def post(self , request:Request)->Response:
+            
+     
+        user = request.user
+        try:
+                post = Post.objects.filter(user=user).all()
+                post = Post.objects.get(id=id)
+                try:
+                    data = request.data
+                    serializer =PostSerializer(post, data=data, partial=True)
+                    if serializer.is_valid():
+                        serializer.save()
+                    
+                    return Response({'result':serializer.data},status=status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({'result':f'Bad request {e}'},status=status.HTTP_400_BAD_REQUEST)
+                
+        except:
+                return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
