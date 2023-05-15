@@ -76,6 +76,6 @@ class DeletePostView(APIView):
         try:
             delete = Post.objects.get(id=pk)
             delete.delete()
-            return Response({{ "status": "deleted post"}})
+            return Response({ "status": "deleted post"},status=status.HTTP_204_NO_CONTENT)
         except:
-            return Response({"result":"url error"})
+            return Response({"result":"url error"},status=status.HTTP_404_NOT_FOUND)
