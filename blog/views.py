@@ -65,3 +65,14 @@ class CreateUser(APIView):
             )
             user.save()
             return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
+
+class DeletePostView(APIView):
+    def post(self, request:Request)->Response:
+        try:
+            id = request.data['id']
+            post = Post.objects.get(id=id)
+            post.delete()
+            return Response({"status": "deleted post"})
+        except:
+            return Response({"error":"No post found for this id"})
+        
