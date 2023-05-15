@@ -32,12 +32,17 @@ class Users(APIView):
         
 
 class PostsView(APIView):
-    def get(self, request: Request) -> Response:
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
+    def get(self, request: Request, id:int=None) -> Response:
+        if id==None:
+            posts = Post.objects.all()
+            serializer = PostSerializer(posts, many=True)
 
-        return Response({"posts": serializer.data})
-        
+            return Response({"posts": serializer.data})
+        else:
+            post1 = Post.objects.get(id=id)
+            print(post1)
+            serializer = PostSerializer(post1)
+            return Response({"post":serializer.data})   
 
 class CreateUser(APIView):
     def post(self,request):
@@ -60,4 +65,3 @@ class CreateUser(APIView):
             )
             user.save()
             return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
-
