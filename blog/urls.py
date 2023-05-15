@@ -6,6 +6,5 @@ urlpatterns = [
     path('users/', Users.as_view()),
     path('users/', CreateUser.as_view()),
     path('posts/', PostsView.as_view()),
-    path('posts/<int:id>', PostsView.as_view()),
     path('delete-post/', DeletePostView.as_view()),
 ]
