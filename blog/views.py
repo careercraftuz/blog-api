@@ -64,8 +64,6 @@ class CreateUser(APIView):
 
 class UpdatePost(APIView):
     def post(self , request:Request,id:id)->Response:
-            
-     
         user = request.user
         try:
                 post = Post.objects.filter(user=user).all()
