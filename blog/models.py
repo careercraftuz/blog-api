@@ -11,6 +11,6 @@ class Post(models.Model):
 
 
 class Reaction(models.Model):
-    like = models.BooleanField(default=False)
+    like = models.BooleanField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
