@@ -4,8 +4,10 @@ from .views import (
     Users,
     CreateUser,
     PostsView,
+    PostView,
     CreatePostView,
     UpdatePost,
+    DeletePostView
     )
 
 urlpatterns = [
@@ -15,4 +17,6 @@ urlpatterns = [
     path('posts/', PostsView.as_view()),
     path('create-post/',CreatePostView.as_view()),
     path('update/<int:id>',UpdatePost.as_view()),
+    path('delete-post/<int:id>',DeletePostView.as_view)
+    path('posts/<int:id>', PostView.as_view()),
 ]
