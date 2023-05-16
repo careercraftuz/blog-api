@@ -94,14 +94,15 @@ class UpdatePost(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         except:
                 return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
-        
 
 class DeletePostView(APIView):
-    def post(self, request: Request, id: int) -> Response:
+    def post(self,request,id:int):
         try:
-            task = Post.objects.get(id=id)
-            task.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            post=Post.objects.get(id=id)
+            post.delete()
+            return Response(
+                { "status": "deleted post"},
+                status=status.HTTP_200_OK
+            )
         except:
-            return Response({'result':'Not found task'}, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
