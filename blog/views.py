@@ -37,6 +37,16 @@ class PostsView(APIView):
         serializer = PostSerializer(posts, many=True)
 
         return Response({"posts": serializer.data})
+    
+
+class PostView(APIView):
+    def get(self, request: Request, id: int) -> Response:
+        try:
+            post = Post.objects.get(id=id)
+            serializer = PostSerializer(post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({"Status": "This post doesn't exist."}, status=status.HTTP_404_NOT_FOUND)
         
 
 class CreateUser(APIView):
@@ -61,6 +71,7 @@ class CreateUser(APIView):
             user.save()
             return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
 
+
 class CreatePostView(APIView):
     def post(self,request:Request):
         data = request.data
@@ -69,16 +80,7 @@ class CreatePostView(APIView):
             serializer.save()
             return Response(serializer.data,status=201)
         return Response(serializer.errors,status=401)
-    
 
-class DeletePostView(APIView):
-    def post(self,request:Request,pk):
-        try:
-            delete = Post.objects.get(id=pk)
-            delete.delete()
-            return Response({ "status": "deleted post"},status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response({"result":"url error"},status=status.HTTP_404_NOT_FOUND)
 class UpdatePost(APIView):
     def put(self,request:Request,id:id)->Response:
         user = request.user
@@ -88,9 +90,18 @@ class UpdatePost(APIView):
             serializer = PostSerializer(task, data=data, partial=True)
             if serializer.is_valid():
                  serializer.save()
-                    
             return Response(serializer.data,status=status.HTTP_200_OK)
-               
-                
         except:
                 return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
+
+class DeletePostView(APIView):
+    def post(self,request,id:int):
+        try:
+            post=Post.objects.get(id=id)
+            post.delete()
+            return Response(
+                { "status": "deleted post"},
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
