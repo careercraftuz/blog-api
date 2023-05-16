@@ -95,4 +95,4 @@ class DeletePostView(APIView):
                 status=status.HTTP_200_OK
             )
         except:
-            return ({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
