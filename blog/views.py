@@ -16,7 +16,7 @@ class UserView(APIView):
             user=User.objects.get(id=id)
             return Response({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
         except:
-            return Response({'result':'User not found'})
+            return Response({'result':'The User you searched for was not found'})
         
 
 class Users(APIView):
