@@ -2,10 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-
+from rest_framework.authtoken.models import Token
 from .models import Post
 from .serializers import PostSerializer
 
@@ -50,6 +50,7 @@ class PostView(APIView):
         
 
 class CreateUser(APIView):
+    permission_classes = (IsAuthenticated, )
     def post(self,request):
         data=request.data
         username=data.get('username', None)
@@ -60,7 +61,13 @@ class CreateUser(APIView):
             return Response({'result':'didn\'t input required data'})
         try:
             user=User.objects.get(username=username)
-            return Response({'result':'Invalid username'})
+            if user.check_password(password):
+                token, _ = Token.objects.get_or_create(user=user)
+                
+            return Response({
+                'token': token.key,
+                'status': status.HTTP_200_OK                 
+                })
         except:
             user=User.objects.create(
                 username=username,
