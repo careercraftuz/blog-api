@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -50,26 +51,23 @@ class PostView(APIView):
         
 
 class CreateUser(APIView):
-    def post(self,request):
+    def post(self, request: Request) -> Response:
         data=request.data
         username=data.get('username', None)
         password=data.get('password', None)
-        first_name=data.get('first_name', None)
-        last_name=data.get('last_name', None)
         if username==None or password==None:
-            return Response({'result':'didn\'t input required data'})
+            return Response({'result': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user=User.objects.get(username=username)
-            return Response({'result':'Invalid username'})
+            return Response({'result': 'This user already exists'})
         except:
             user=User.objects.create(
                 username=username,
-                password=make_password(password),
-                first_name=first_name,
-                last_name=last_name
+                password=make_password(password)
             )
             user.save()
-            return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
+            token = Token.objects.create(user=user)
+            return Response({ "token": token.key }, status=status.HTTP_200_OK)
 
 
 class CreatePostView(APIView):
