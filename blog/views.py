@@ -16,7 +16,7 @@ class UserView(APIView):
             user=User.objects.get(id=id)
             return Response({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
         except:
-            return Response({'result':'User not found'})
+            return Response({'result':'User ID not found'})
         
 
 class Users(APIView):
@@ -28,7 +28,7 @@ class Users(APIView):
                 data.append({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
             return Response(data)
         except:
-            return Response({'result':'Users not found'})
+            return Response({'result':'No users list found'})
         
 
 class PostsView(APIView):
@@ -106,3 +106,4 @@ class DeletePostView(APIView):
             )
         except:
             return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
+
