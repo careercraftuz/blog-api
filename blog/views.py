@@ -104,3 +104,24 @@ class DeletePostView(APIView):
             )
         except:
             return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class LoginUser(APIView):
+    def post(self,request: Request) -> Response:
+        data=request.data
+        username=data.get('username', None)
+        password=data.get('password', None)
+        if username==None or password==None:
+            return Response({'result':'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user=User.objects.get(username=username)
+            if user.check_password(password):
+                token = Token.objects.filter(user=user)
+                if len(token) > 0:
+                    token.delete()
+                token = Token.objects.create(user=user)
+                return Response({"token": token.key}, status=status.HTTP_200_OK)
+            else:
+                return Response({'result':'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
