@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -16,7 +17,7 @@ class UserView(APIView):
             user=User.objects.get(id=id)
             return Response({ "username": user.username, "first_name": user.first_name, "last_name": user.first_name})
         except:
-            return Response({'result':'User not found'})
+            return Response({'result':'The User you searched for was not found'})
         
 
 class Users(APIView):
@@ -50,24 +51,56 @@ class PostView(APIView):
         
 
 class CreateUser(APIView):
-    def post(self,request):
+    def post(self, request: Request) -> Response:
         data=request.data
         username=data.get('username', None)
         password=data.get('password', None)
-        first_name=data.get('first_name', None)
-        last_name=data.get('last_name', None)
         if username==None or password==None:
-            return Response({'result':'didn\'t input required data'})
+            return Response({'result': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user=User.objects.get(username=username)
-            return Response({'result':'Invalid username'})
+            return Response({'result': 'This user already exists'})
         except:
             user=User.objects.create(
                 username=username,
-                password=make_password(password),
-                first_name=first_name,
-                last_name=last_name
+                password=make_password(password)
             )
             user.save()
-            return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
+            token = Token.objects.create(user=user)
+            return Response({ "token": token.key }, status=status.HTTP_200_OK)
 
+
+class CreatePostView(APIView):
+    def post(self,request:Request):
+        data = request.data
+        serializer = PostSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=201)
+        return Response(serializer.errors,status=401)
+
+
+class UpdatePost(APIView):
+    def put(self,request:Request,id:id)->Response:
+        user = request.user
+        try:
+            task = Post.objects.get(user=user,id=id)
+            data = request.data
+            serializer = PostSerializer(task, data=data, partial=True)
+            if serializer.is_valid():
+                 serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+                return Response({'result':'Not found task'},status=status.HTTP_404_NOT_FOUND)
+
+class DeletePostView(APIView):
+    def post(self,request,id:int):
+        try:
+            post=Post.objects.get(id=id)
+            post.delete()
+            return Response(
+                { "status": "deleted post"},
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
