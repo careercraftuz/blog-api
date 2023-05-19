@@ -104,3 +104,12 @@ class DeletePostView(APIView):
             )
         except:
             return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
+         
+class LoginUser(APIView):
+    def put(self,request:Request)->Response:
+        user = request.user
+        if user:
+            token = Token.objects.get(user=user)
+            token.delete()
+            create_token=Token.objects.create(user=user)
+            return Response({"token":create_token.key},status=status.HTTP_200_OK)
