@@ -125,3 +125,15 @@ class LoginUser(APIView):
                 return Response({'result':'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+class LogoutUser(APIView):
+    def post(self, request:Request)->Response:
+        data= request.data
+        username=data.get('username')
+        try:
+            user= User.objects.get(username=username)
+            token = Token.objects.filter(user=user)
+            if len(token)>0:
+                token.delete()
+                return Response({"result":"user logout "}, status=status.HTTP_200_OK)
+        except:
+            return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
