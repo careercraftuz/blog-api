@@ -131,9 +131,8 @@ class LogoutUser(APIView):
     def post(self, request:Request)->Response:
         user= request.user
         try:
-            token = Token.objects.filter(user=user)
-            if len(token)>0:
-                token.delete()
-                return Response({"result":"user logout "}, status=status.HTTP_200_OK)
+            token = Token.objects.get(user=user)
+            token.delete()
+            return Response({"result":"user logout "}, status=status.HTTP_200_OK)
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
