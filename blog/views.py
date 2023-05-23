@@ -2,9 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-
+from django.contrib.auth import authenticate
+from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Post
 from .serializers import PostSerializer
@@ -106,3 +108,37 @@ class DeletePostView(APIView):
             )
         except:
             return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# def login_user(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+
+#         user = authenticate(username=username, password=password)
+
+#         if user is not None:
+#             
+#             token = generate_token(user)
+
+#             
+#             return JsonResponse({'token': token}, status=200)
+#         else:
+#             return JsonResponse({'error': 'Invalid username or password'}, status=400)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+# def generate_token(user):
+    
+#     return 'generated_token'
+    
+    
+class LogoutUser(APIView):
+        permission_classes = (IsAuthenticated,)
+
+        def post(self, request):
+            # Invalidate the user's token or session
+            request.user.auth_token.delete()
+
+            # Return a response with a successful status code
+            return Response(status=status.HTTP_200_OK)
