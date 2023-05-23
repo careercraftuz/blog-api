@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
@@ -107,6 +107,7 @@ class DeletePostView(APIView):
 
 
 class LoginUser(APIView):
+    
     def post(self,request: Request) -> Response:
         data=request.data
         username=data.get('username', None)
@@ -123,5 +124,15 @@ class LoginUser(APIView):
                 return Response({"token": token.key}, status=status.HTTP_200_OK)
             else:
                 return Response({'result':'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+class LogoutUser(APIView):
+    authentication_classes=[TokenAuthentication]
+    def post(self, request:Request)->Response:
+        user= request.user
+        try:
+            token = Token.objects.get(user=user)
+            token.delete()
+            return Response({"result":"user logout "}, status=status.HTTP_200_OK)
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
