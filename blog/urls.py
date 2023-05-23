@@ -8,7 +8,8 @@ from .views import (
     CreatePostView,
     UpdatePost,
     DeletePostView,
-    LoginUser
+    LoginUser,
+    LogoutUser
     )
 
 urlpatterns = [
