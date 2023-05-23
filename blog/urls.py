@@ -9,7 +9,8 @@ from .views import (
     UpdatePost,
     DeletePostView,
     LoginUser,
-    LogoutUser
+    LogoutUser,
+    CreateReaction,
     )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('update/<int:id>',UpdatePost.as_view()),
     path('delete-post/<int:id>',DeletePostView.as_view()),
     path('posts/<int:id>', PostView.as_view()),
+    path('create-reaction', CreateReaction.as_view()),
 ]
