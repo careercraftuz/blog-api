@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -125,3 +127,13 @@ class LoginUser(APIView):
                 return Response({'result':'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class LogoutUser(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    def post(self, request: Request) -> Response:
+        print(request.auth)
+        token = Token.objects.get(key=request.auth)
+        token.delete()
+        return Response(status=status.HTTP_200_OK)
