@@ -72,14 +72,16 @@ class CreateUser(APIView):
             return Response({ "token": token.key }, status=status.HTTP_200_OK)
 
 
-class CreatePostView(APIView):
-    def post(self,request:Request):
+class CreatePost(APIView):
+    authentication_classes = [TokenAuthentication]
+    def post(self, request: Request):
         data = request.data
+        data["author"] = request.user.id
         serializer = PostSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data,status=201)
-        return Response(serializer.errors,status=401)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UpdatePost(APIView):
