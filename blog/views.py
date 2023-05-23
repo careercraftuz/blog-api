@@ -117,12 +117,15 @@ class LoginUser(APIView):
             token.delete()
         token = Token.objects.create(user=user)
         return Response({"token": token.key}, status=status.HTTP_200_OK)
-
+    
 
 class LogoutUser(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
-    def post(self, request: Request) -> Response:
-        token = Token.objects.get(key=request.auth)
-        token.delete()
-        return Response(status=status.HTTP_200_OK)
+    authentication_classes=[TokenAuthentication]
+    def post(self, request:Request)->Response:
+        user= request.user
+        try:
+            token = Token.objects.get(user=user)
+            token.delete()
+            return Response({"result":"user logout "}, status=status.HTTP_200_OK)
+        except:
+            return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
