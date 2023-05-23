@@ -2,11 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from django.contrib.auth import authenticate
-from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-from rest_framework.permissions import IsAuthenticated
 
 from .models import Post
 from .serializers import PostSerializer
@@ -52,26 +51,23 @@ class PostView(APIView):
         
 
 class CreateUser(APIView):
-    def post(self,request):
+    def post(self, request: Request) -> Response:
         data=request.data
         username=data.get('username', None)
         password=data.get('password', None)
-        first_name=data.get('first_name', None)
-        last_name=data.get('last_name', None)
         if username==None or password==None:
-            return Response({'result':'didn\'t input required data'})
+            return Response({'result': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user=User.objects.get(username=username)
-            return Response({'result':'Invalid username'})
+            return Response({'result': 'This user already exists'})
         except:
             user=User.objects.create(
                 username=username,
-                password=make_password(password),
-                first_name=first_name,
-                last_name=last_name
+                password=make_password(password)
             )
             user.save()
-            return Response({ "message": "User created successfully." },status=status.HTTP_201_CREATED)
+            token = Token.objects.create(user=user)
+            return Response({ "token": token.key }, status=status.HTTP_200_OK)
 
 
 class CreatePostView(APIView):
@@ -110,35 +106,31 @@ class DeletePostView(APIView):
             return Response({'status':'Post Not Found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-# def login_user(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
+class LoginUser(APIView):
+    def post(self,request: Request) -> Response:
+        data=request.data
+        username=data.get('username', None)
+        password=data.get('password', None)
+        if username==None or password==None:
+            return Response({'result':'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user=User.objects.get(username=username)
+            if user.check_password(password):
+                token = Token.objects.filter(user=user)
+                if len(token) > 0:
+                    token.delete()
+                token = Token.objects.create(user=user)
+                return Response({"token": token.key}, status=status.HTTP_200_OK)
+            else:
+                return Response({'result':'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
 
-#         user = authenticate(username=username, password=password)
 
-#         if user is not None:
-#             
-#             token = generate_token(user)
-
-#             
-#             return JsonResponse({'token': token}, status=200)
-#         else:
-#             return JsonResponse({'error': 'Invalid username or password'}, status=400)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
-# def generate_token(user):
-    
-#     return 'generated_token'
-    
-    
 class LogoutUser(APIView):
-        permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
-        def post(self, request):
-            # Invalidate the user's token or session
-            request.user.auth_token.delete()
-
-            # Return a response with a successful status code
-            return Response(status=status.HTTP_200_OK)
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
