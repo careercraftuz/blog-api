@@ -9,8 +9,8 @@ from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
-from .models import Post
-from .serializers import PostSerializer
+from .models import Post, Reaction
+from .serializers import PostSerializer, ReactionSerializer
 
 
 class UserView(APIView):
@@ -131,3 +131,15 @@ class LogoutUser(APIView):
             return Response({"result":"user logout "}, status=status.HTTP_200_OK)
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class CreateReaction(APIView):
+    authentication_classes = [TokenAuthentication]
+    def post(self, request: Request) -> Response:
+        data = request.data
+        data['user'] = request.user.id
+        serializer = ReactionSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "Reaction created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
