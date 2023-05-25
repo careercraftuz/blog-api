@@ -5,7 +5,7 @@ from .views import (
     CreateUser,
     PostsView,
     PostView,
-    CreatePostView,
+    CreatePost,
     UpdatePost,
     DeletePostView,
     LoginUser,
@@ -25,4 +25,3 @@ urlpatterns = [
     path('delete-post/<int:id>', DeletePostView.as_view()),
     path('create-reaction/', CreateReactionView.as_view())
 ]
-
