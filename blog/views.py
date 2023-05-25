@@ -111,44 +111,26 @@ class DeletePostView(APIView):
 
 
 class LoginUser(APIView):
-    def post(self, request: Request) -> Response:
-        data = request.data
-        username = data.get('username', None)
-        password = data.get('password', None)
-        if username == None or password == None:
-            return Response({'result': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request: Request) -> Response:
+        user = request.user
+        token = Token.objects.filter(user=user)
+        if len(token) > 0:
+            token.delete()
+        token = Token.objects.create(user=user)
+        return Response({"token": token.key}, status=status.HTTP_200_OK)
+    
+
+class LogoutUser(APIView):
+    authentication_classes=[TokenAuthentication]
+    
+    def post(self, request:Request)->Response:
+        user= request.user
         try:
-            user = User.objects.get(username=username)
-            if user.check_password(password):
-                token = Token.objects.filter(user=user)
-                if len(token) > 0:
-                    token.delete()
-                token = Token.objects.create(user=user)
-                return Response({"token": token.key}, status=status.HTTP_200_OK)
-            else:
-                return Response({'result': 'Invalid password'}, status=status.HTTP_400_BAD_REQUEST)
+            token = Token.objects.get(user=user)
+            token.delete()
+            return Response({"result":"user logout "}, status=status.HTTP_200_OK)
+          
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-class CreateReactionView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
-
-    def post(self, request: Request):
-        user = request.user
-        post_id = request.data.get('post_id')
-
-        try:
-            post = Post.objects.get(pk=post_id)
-        except Post.DoesNotExist:
-            return Response({'error': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ReactionSerializer(
-            data={'like': True, 'user': user.id, 'post': post.id})
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
