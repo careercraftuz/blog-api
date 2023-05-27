@@ -139,3 +139,15 @@ class LogoutUser(APIView):
           
         except:
             return Response({'result': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class CreateReaction(APIView):
+    authentication_classes = [TokenAuthentication]
+    def post(self, request: Request) -> Response:
+        data = request.data
+        data['user'] = request.user.id
+        serializer = ReactionSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "Reaction created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
